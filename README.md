@@ -97,6 +97,7 @@ There is also support for loadable extras not included in any builds:
 
 ## Loading
 
+### STM32 Boards
 To load the zeptoforth image (whether just the kernel or an image including precompiled Forth code) onto an STM32L476, STM32F407, or STM32F746 DISCOVERY board or an STM32F411 "Black Pill" board , first install st-flash, then attach the DISCOVERY board to one's PC via USB and execute:
 
     $ st-flash erase
@@ -129,6 +130,7 @@ Loading zeptoforth onto STM32F411 Nucleo 64 boards has been done, but that is le
 
 After that the console will switch to 115200 baud, so one will need to restart one's terminal emulator at that baud. Additionally, the system clock will increase by a factor of 3.125 to its normal clock of 96 MHz.
 
+### RP2040/RP2350 Boards
 To load the zeptoforth image (whether just the kernel or an image including precompiled Forth code) onto a RP2040 or RP2350-based board, hold down the BOOTSEL button while connecting the board to one's computer via USB. This will result in a USB Mass Storage device appearing in one's `/dev` directory, and if supported by one's system, automatically mounted. Then one can copy the appropriate UF2 file to the USB Mass Storage device, which will automatically cause it to be loaded into flash and then executed.
 
 Prebuilt binaries are in `bin/<version>/<platform>/` in release tarballs. They are not included in source code-only zips or tarballs, or in the git repository.
