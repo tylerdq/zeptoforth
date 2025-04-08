@@ -219,18 +219,6 @@ Afterwards, execute:
 
 This will transfer `YOURFILE.TXT` on your board to \<your file> on your computer.
 
-## Building the Kernel
-
-To build the kernel for each of the supported platforms, one first needs to install the gas and binutils arm-none-eabi toolchain along with Python 3.9 or later and the dependencies necessary for Python Venv (e.g. the package `python3.11-venv` for Python 3.11 on Debian or Ubuntu), and then execute:
-
-    $ make
-
-to use the default version or:
-
-    $ make VERSION=<version>
-
-This build a `zeptoforth.<platform>.bin`, a `zeptoforth.<platform>.ihex`, and a `zeptoforth.<platform>.elf` file for each supported platform. Additionally a `zeptoforth.rp2040.uf2` file will be built for the `rp2040` platform, a `zeptoforth.rp2040_big.uf2` file will be built for the `rp2040_big` platform, a `zeptoforth.rp2350.uf2` file will be built for the `rp2350` platform, and a `zeptoforth.rp2350_16mib.uf2` file will be built for the `rp2350_16mib` platform. The `zeptoforth.<platform>.elf` file is of use if one wishes to do source debugging with gdb of the zeptoforth kernel, otherwise disregard it.
-
 ## Console Access
 
 ### Web terminal
@@ -252,6 +240,30 @@ The following applies if one is using e4thcom: If one is using an STM32F407 DISC
     $ e4thcom -t noforth -b B115200 -d <device, typically one of ttyACM0 or ttyUSB0>
 
 As noted before, for the initial configuration of freshly flashed STM32F411 Nucleo 64 boards, use B38400 rather than B115200.
+
+## Other Terminal Emulators
+
+Another terminal emulator one may use is picocom, which has many of the same considerations here as GNU Screen. For this reason it is not recommended for mass code uploads, for which `codeload3.sh` is a better choice, and rather is limited in practice to interactive usage.
+
+If one is using swdcom (assuming one has already built it and installed `swd2` in some suitable location such as `/usr/local/bin` and that one has already written the `zeptoforth_swdcom-<version>.bin` binary to the board), simply execute `swd2`. This will provide a terminal session with zeptoforth. To upload Forth code to execute to the board, execute in the directory from which `swd2` was executed:
+
+    cat <path> > upload.fs && pkill -QUIT swd2
+
+This will simply upload the given file to the board as-is without any support for `#include` or `#require`, unlike e4thcom.
+
+Note that screen and e4thcom are not suitable for using the block editor on the STM32F746 DISCOVERY board or an RP2040 or RP2350-based board—attempting to use the block editor on them will lock up zeptoforth because it will wait forever for a response when querying the terminal for a cursor position—whereas picocom and swdcom enable it to be used. Also, to use the block editor one must have the backspace key set to $7F (DEL), as it is by default; remapping backspace to backspace will break deleting characters in the block editor.
+
+## Building the Kernel
+
+To build the kernel for each of the supported platforms, one first needs to install the gas and binutils arm-none-eabi toolchain along with Python 3.9 or later and the dependencies necessary for Python Venv (e.g. the package `python3.11-venv` for Python 3.11 on Debian or Ubuntu), and then execute:
+
+    $ make
+
+to use the default version or:
+
+    $ make VERSION=<version>
+
+This build a `zeptoforth.<platform>.bin`, a `zeptoforth.<platform>.ihex`, and a `zeptoforth.<platform>.elf` file for each supported platform. Additionally a `zeptoforth.rp2040.uf2` file will be built for the `rp2040` platform, a `zeptoforth.rp2040_big.uf2` file will be built for the `rp2040_big` platform, a `zeptoforth.rp2350.uf2` file will be built for the `rp2350` platform, and a `zeptoforth.rp2350_16mib.uf2` file will be built for the `rp2350_16mib` platform. The `zeptoforth.<platform>.elf` file is of use if one wishes to do source debugging with gdb of the zeptoforth kernel, otherwise disregard it.
 
 ## Building, Continued
 
@@ -321,17 +333,4 @@ which will build `bin/<version>/<platform>/zeptoforth_<build>-<version>.bin` and
 
     utils/make_uf2_image.sh <version> <platform> <TTY device> <build>
 
-which will build `bin/<version>/<platform>/zeptoforth_<build>-<version>.uf2` and the associated `.ihex` and `.bin` files. Note that when using `utils/make_uf2_image.sh` multiple times in a row the user must manually execute `erase-all` at the console between them. If you are building a USB console based image, there `make_uf2_image.sh` will mention an extra reboot step and recommend using `download_uf2_image.sh` to avoid problems with the USB console takikng over in the middle of
-the build operation.
-
-## Other Terminal Emulators
-
-Another terminal emulator one may use is picocom, which has many of the same considerations here as GNU Screen. For this reason it is not recommended for mass code uploads, for which `codeload3.sh` is a better choice, and rather is limited in practice to interactive usage.
-
-If one is using swdcom (assuming one has already built it and installed `swd2` in some suitable location such as `/usr/local/bin` and that one has already written the `zeptoforth_swdcom-<version>.bin` binary to the board), simply execute `swd2`. This will provide a terminal session with zeptoforth. To upload Forth code to execute to the board, execute in the directory from which `swd2` was executed:
-
-    cat <path> > upload.fs && pkill -QUIT swd2
-
-This will simply upload the given file to the board as-is without any support for `#include` or `#require`, unlike e4thcom.
-
-Note that screen and e4thcom are not suitable for using the block editor on the STM32F746 DISCOVERY board or an RP2040 or RP2350-based board—attempting to use the block editor on them will lock up zeptoforth because it will wait forever for a response when querying the terminal for a cursor position—whereas picocom and swdcom enable it to be used. Also, to use the block editor one must have the backspace key set to $7F (DEL), as it is by default; remapping backspace to backspace will break deleting characters in the block editor
+which will build `bin/<version>/<platform>/zeptoforth_<build>-<version>.uf2` and the associated `.ihex` and `.bin` files. Note that when using `utils/make_uf2_image.sh` multiple times in a row the user must manually execute `erase-all` at the console between them. If you are building a USB console based image, there `make_uf2_image.sh` will mention an extra reboot step and recommend using `download_uf2_image.sh` to avoid problems with the USB console takikng over in the middle of the build operation.
